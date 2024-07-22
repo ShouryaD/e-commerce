@@ -1,5 +1,11 @@
 let db = require('../dbConfig.js')
 let bcrypt = require('bcryptjs')
+let jwt = require('jsonwebtoken')
+
+function generateToken(user){
+    return jwt.sign({id: user.id}, 'jello', {expiresIn:'1h'})
+}
+
 exports.signUp =async (req,res)=>{
     let name = req.body.name
     let userName = req.body.userName
@@ -37,11 +43,13 @@ exports.userLogin = (req,res)=>{
             // else{
             //     res.send(false)
             // }
-        bcrypt.compare(password,result[0].password,(err,isMatch)=>{
+        bcrypt.compare(password,result[0].password,async (err,isMatch)=>{
             if(err) throw err
             else{
                 if(isMatch==true){
-                    res.send(true)
+                    let token = await generateToken(result[0])
+                    console.log(token)
+                    res.json({isMatch,token})
                 }
                 else{
                     res.send(false)
