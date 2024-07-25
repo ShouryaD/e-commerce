@@ -2,8 +2,9 @@ let db = require('../dbConfig.js')
 let bcrypt = require('bcryptjs')
 let jwt = require('jsonwebtoken')
 
+
 function generateToken(user){
-    return jwt.sign({id: user.id}, 'jello', {expiresIn:'1h'})
+    return jwt.sign({id: user.id},process.env.JWT, {expiresIn:'1h'})
 }
 
 exports.signUp =async (req,res)=>{
