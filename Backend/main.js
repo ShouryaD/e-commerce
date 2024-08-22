@@ -40,6 +40,17 @@ CREATE TABLE IF NOT EXISTS Cart(
     PRIMARY KEY (ID)
 )
 `
+let productTable = `
+create table if not exists product(
+    id int not null auto_increment,
+    name varchar(255),
+    type varchar(255),
+    rating varchar(255),
+    price varchar(255),
+    image varchar(255),
+    primary key(id)
+)
+`
 db.connect((err)=>{
     if(err) throw err
     else{
@@ -58,6 +69,10 @@ CREATE TABLE IF NOT EXISTS UserLogin(
     PRIMARY KEY (ID)
 )
 `
+db.query(productTable, (err, result)=>{
+    if(err) throw err
+    else console.log('Product table created')
+})
 db.query(userTable, (err, result)=>{
     if(err) throw err
     else console.log('User Login table created')
@@ -71,6 +86,7 @@ db.query(cartTable,(err,result)=>{
     if(err) throw err
     else console.log('Cart table created')
 })
+
 
 
 

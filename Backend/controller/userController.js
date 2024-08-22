@@ -4,7 +4,7 @@ let jwt = require('jsonwebtoken')
 
 
 function generateToken(user){
-    return jwt.sign({id: user.id},process.env.JWT, {expiresIn:'1h'})
+    return jwt.sign({id: user.ID},process.env.JWT, {expiresIn:'1h'})
 }
 
 exports.signUp =async (req,res)=>{
@@ -93,4 +93,24 @@ exports.getClient = (req,res)=>{
             res.json(result)
         }
     })
+}
+
+exports.verify = (req,res)=>{
+    let token = req.headers['authorization'].split(' ')[1]
+    console.log(token + ' hello')
+    if(token){
+        jwt.verify(token, process.env.JWT, (err, decode)=>{
+            if(err) throw err
+            else{
+                let sql = 'select * from userlogin where id = ?'
+                db.query(sql, [decode.id], (err, result)=>{
+                    if(err) throw err
+                    else{
+                        console.log(result)
+                        res.json(result[0])
+                    }
+                })
+            }
+        })
+    }
 }

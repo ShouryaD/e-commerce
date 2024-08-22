@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import userContext from '../../context/userContext'
 import axios from 'axios'
+import logo from '../../assets/logo.jpg'
 
 
 const menuItems = [
@@ -29,22 +30,32 @@ export default function ClientNavbar() {
     setIsMenuOpen(!isMenuOpen)
   }
 
-  let {list} = useContext(userContext)
+  let { list } = useContext(userContext)
 
-let {login} = useContext(userContext)
-let [data,setData] = useState([])
-useEffect(()=>{
-  getCLient()
-},[login])
-  async function getCLient(){
-    let result = await axios.get(`http://127.0.0.1:3000/api/getUser/${login}`)
-    console.log(result)
-    setData(result.data)
+  let { auth, userLogout } = useContext(userContext)
+  let [data, setData] = useState([])
+  useEffect(() => {
+    getCLient()
+  }, [auth])
+  async function getCLient() {
+    if (auth.userId) {
+      let result = await axios.get(`http://127.0.0.1:3000/api/getUser/${auth.userId}`)
+      console.log(result)
+      setData(result.data)
+    }
+  }
+
+  function Logout(){
+    userLogout()
+    window.location.reload()
   }
   return (
-    <div className="fixed w-full bg-white p-2">
+    <div className=" w-full bg-white p-2">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
-        
+        <div className='inline-flex items-center space-x-2'>
+          <img className='h-10' src={logo} alt="" />
+          <h1 className='text-xl font-bold font-serif'>Buyer</h1>
+        </div>
         <div className="hidden grow items-start lg:flex">
           <ul className="ml-12 inline-flex space-x-8">
             {menuItems.map((item) => (
@@ -60,26 +71,27 @@ useEffect(()=>{
           </ul>
         </div>
         <div className='flex items-center'>
-        
-        <div className="hidden lg:block relative">
-          <Link
-            type="button" to='/cart'
-            className="relative rounded-full bg-blue-300 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-          >
-            Cart
-          </Link>
-          <span className={`${list ? 'absolute -top-[20px] right-[1px] text-2xl' : 'hidden'}`}>{list}</span>
-        </div>
-        {data.map((data)=>(
-                  <div className="ml-4 flex items-center space-x-2 relative cursor-pointer">
-                  <img
-                    className="inline-block h-10 w-10 rounded-full"
-                    src={`http://127.0.0.1:3000/${data.image}`}
-                    alt="Dan_Abromov"
-                  />
-                  <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-600 ring-2 ring-white"></span>
-                </div>
-                ))}
+
+          <div className="hidden lg:block relative">
+            {auth.userId && <button className='px-2 py-2 bg-black rounded-full mr-4 text-white text-sm font-semibold hover:bg-slate-400' onClick={Logout}>Logout</button>}
+            <Link
+              type="button" to='/cart'
+              className="relative rounded-full bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            >
+              Cart
+            </Link>
+            <span className={`${list ? 'absolute -top-[18px] right-[-5px] text-2xl bg-red-400 text-white rounded-full px-1' : 'hidden'}`}>{list}</span>
+          </div>
+          {data.map((data) => (
+            <div className="ml-4 flex items-center space-x-2 relative cursor-pointer">
+              <img
+                className="inline-block h-10 w-10 rounded-full object-cover"
+                src={`http://127.0.0.1:3000/${data.image}`}
+                alt="Dan_Abromov"
+              />
+              <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-600 ring-2 ring-white"></span>
+            </div>
+          ))}
         </div>
         <div className="lg:hidden">
           <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />

@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import userContext from '../../context/userContext'
 
 export default function ClientLogin() {
@@ -18,24 +17,16 @@ export default function ClientLogin() {
     setLogin1({...login1, [e.target.name]:e.target.value})
   }
 
-  let {setLogin} = useContext(userContext)
+  let {userLogin} = useContext(userContext)
 
   async function submitData(e){
     e.preventDefault()
-    let result = await axios.post('http://127.0.0.1:3000/api/userLogin', login1)
-    let unique = login1.email.split('@')[0]
-    console.log(result.data)
-    localStorage.setItem('token', result.data.token)
-    if(result.data.isMatch == true){
-      setLogin(unique)
-      createClient(unique)
-     navigation('/')
+    let flag = await userLogin(login1)
+    if(flag){
+      navigation('/')
     }
-   
   }
-  async function createClient(unique){
-    await axios.post(`http://127.0.0.1:3000/api/createUser/${unique}`)
-  }
+  
 
   return (
     <section>

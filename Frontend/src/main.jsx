@@ -14,6 +14,7 @@ import Protected from './components/Protected.jsx'
 import Cart from './components/client/Cart.jsx'
 import ClientLogin from './components/client/ClientLogin.jsx'
 import ClientSignUp from './components/client/ClientSignup.jsx'
+import Checkout from './components/client/Checkout.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -23,6 +24,7 @@ const router = createBrowserRouter(
       <Route path='/cart' element = {<Cart/>}/>
       <Route path='/login' element = {<ClientLogin/>}/>
       <Route path='/signUp' element = {<ClientSignUp/>}/>
+      <Route path='/checkout' element = {<Checkout/>}/>
     </Route>
     
     <Route path='/admin' element = {<App/>}>

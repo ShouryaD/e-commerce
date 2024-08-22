@@ -8,6 +8,8 @@ export default function Sidebar() {
   let [data, setData] = useState([]);
   let [inp, setInp] = useState("");
   let navigate = useNavigate();
+  let { auth } = useContext(userContext);
+
   useEffect(() => {
     getData();
     getCart();
@@ -54,14 +56,15 @@ export default function Sidebar() {
   }, [inp]);
 
   async function searchBar() {
-    let result = await axios.get(`http://127.0.0.1:3000/api/getName/${inp}`);
-    setData(result.data);
+    if (inp !== '') {
+      let result = await axios.get(`http://127.0.0.1:3000/api/getName/${inp}`);
+      setData(result.data);
+    }
   }
-  let { login } = useContext(userContext);
 
   async function addToCart(data) {
-    if (login) {
-      await axios.post(`http://127.0.0.1:3000/api/saveCart/${login}`, {
+    if (auth.userId) {
+      await axios.post(`http://127.0.0.1:3000/api/saveCart/${auth.userId}`, {
         name: data.name,
         type: data.type,
         rating: data.rating,
@@ -78,36 +81,38 @@ export default function Sidebar() {
   let { setList } = useContext(userContext);
 
   async function getCart() {
-    let result = await axios.get(`http://127.0.0.1:3000/api/getCart/${login}`);
-    setList(result.data.length);
+    if (auth.userId) {
+      let result = await axios.get(`http://127.0.0.1:3000/api/getCart/${auth.userId}`);
+      setList(result.data.length);
+    }
   }
 
   return (
     <>
-      <aside className="flex fixed h-3/4 w-64 flex-col overflow-y-auto border-r bg-blue-100 px-5 py-8 mt-[6.5rem] rounded-md">
-        <div class="relative mt-6">
-          <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-            <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none">
+      <aside className="flex fixed h-3/4 w-64 flex-col overflow-y-auto border-r bg-slate-100 px-5 py-8 mt-[6.5rem] rounded-md">
+        <div className="relative mt-6">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none">
               <path
                 d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               ></path>
             </svg>
           </span>
 
           <input
             type="text"
-            class="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-md dark:bg-blue-200 dark:text-white-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:ring-opacity-40 focus:outline-none focus:ring"
+            className="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-md dark:bg-slate-200 dark:text-white-300 dark:border-gray-600 focus:border-slate-400 dark:focus:border-slate-300 focus:ring-slate-300 focus:ring-opacity-40 focus:outline-none focus:ring"
             placeholder="Search"
             onChange={(e) => setInp(e.target.value)}
           />
         </div>
         {/* <button
             type="button"
-            class="w-1/3 mt-5 py-2 pl-3.5 pr-4 text-gray-700 bg-white border rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:ring-opacity-40 focus:outline-none focus:ring" onClick={searchBar}
+            className="w-1/3 mt-5 py-2 pl-3.5 pr-4 text-gray-700 bg-white border rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:ring-opacity-40 focus:outline-none focus:ring" onClick={searchBar}
           >Search</button> */}
         <div className="mt-6 flex flex-1 flex-col justify-between">
           <nav className="-mx-3 space-y-6 ">
@@ -226,16 +231,16 @@ export default function Sidebar() {
       </div>
       <div className="flex flex-wrap w-2/3 justify-between ml-[20vw] absolute top-[8vh]">
         {data.map((data) => (
-          <div className="w-[300px] mt-[25px] rounded-md border bg-green-100 transform hover:scale-110 transition-transform duration-300">
+          <div className="w-[300px] mt-[25px] rounded-md border bg-slate-100 transform hover:scale-110 transition-transform duration-300" key={data.id}>
             <img
-              src="https://www.91-cdn.com/hub/wp-content/uploads/2022/07/Top-laptop-brands-in-India.jpg"
+              src={`http://127.0.0.1:3000/${data.image}`}
               // {`http://127.0.0.1:3000/${data.image}`}
               alt="Laptop"
               className="h-[200px] w-full rounded-md object-cover transform hover:scale-110 transition-transform duration-300"
             />
             <div className="p-4 text-center">
               <h1 className="inline-flex items-center justify-center text-lg font-semibold">
-                {data.name} &nbsp; <ArrowUpRight className="h-4 w-4" />
+                {data.name}
               </h1>
               <br />
               <h1 className="inline-flex items-center text-lg font-semibold">
@@ -253,7 +258,7 @@ export default function Sidebar() {
               <button
                 type="button"
                 onClick={() => addToCart(data)}
-                className="mt-4 w-2/3 rounded-3xl bg-blue-300 px-2 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                className="mt-4 w-2/3 rounded-3xl bg-black px-2 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
               >
                 Add To Cart
               </button>
